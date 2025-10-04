@@ -3,7 +3,7 @@
 A **full-stack task management system** that allows **admins** to assign tasks to users and **track their progress** efficiently.  
 Built with **Node.js**, **Express**, **MongoDB**, **React**, and **Tailwind CSS** — it offers a clean, responsive UI and secure authentication using **JWT**.
 
-![Dashboard Preview](./assets/dashboard.png)
+![Dashboard Preview](./frontend/Task-Manager/src/assets/images/auth-img.png)
 
 ---
 
