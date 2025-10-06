@@ -14,8 +14,9 @@ const app = express();
 console.log("URL before the process ",process.env.CLIENT_URL);
 
 // CLIENT_ORIGINS env example:
-// CLIENT_ORIGINS="https://my-frontend.vercel.app,https://my-frontend-git-preview.vercel.app"
+CLIENT_ORIGINS="https://my-frontend.vercel.app,https://my-frontend-git-preview.vercel.app"
 const raw = process.env.CLIENT_ORIGINS || process.env.CLIENT_URL || "";
+
 const allowedOrigins = raw.split(',').map(s => s.trim()).filter(Boolean);
 
 const corsOptions = {

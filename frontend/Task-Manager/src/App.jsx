@@ -16,6 +16,7 @@ import UserProvider, { UserContext } from "./context/userContext";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
+  
   return (
     <UserProvider>
       <div>
@@ -41,6 +42,7 @@ const App = () => {
                 element={<ViewTaskDetails />}
               />
             </Route>
+            
 
              {/* Default Route */}
             <Route path="/" element={<Root />} />
