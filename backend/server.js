@@ -51,6 +51,11 @@ connectDB();
 // Middleware
 app.use(express.json());
 
+
+app.get("/helloWorld", (req, res) => {
+  res.status(200).json({ message: "you are in" });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
