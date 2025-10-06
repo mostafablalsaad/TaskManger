@@ -11,13 +11,38 @@ const reportRoutes = require("./routes/reportRoutes")
 
 const app = express();
 
+console.log("URL before the process ",process.env.CLIENT_URL);
+
+// CLIENT_ORIGINS env example:
+// CLIENT_ORIGINS="https://my-frontend.vercel.app,https://my-frontend-git-preview.vercel.app"
+const raw = process.env.CLIENT_ORIGINS || process.env.CLIENT_URL || "";
+const allowedOrigins = raw.split(',').map(s => s.trim()).filter(Boolean);
+
+const corsOptions = {
+  origin: function(origin, callback) {
+    // allow requests with no origin (e.g., curl, mobile, server-to-server)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.length === 0) {
+      // No origins configured — deny by default (safer)
+      return callback(new Error('CORS not allowed - no allowed origins configured'), false);
+    }
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed by server'), false);
+    }
+  },
+  credentials: true, // allow session cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Set-Cookie'] // expose Set-Cookie if needed
+};
+
 // Middleware to handle CORS
 app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  cors(corsOptions)
 );
 
 // Connect Database
