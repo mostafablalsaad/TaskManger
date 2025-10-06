@@ -31,6 +31,10 @@ const Login = () => {
 
     setError("");
 
+    console.log("ApI paths for the web server" ,API_PATHS);
+    console.log("Base URL for the axios " ,axiosInstance.defaults.baseURL);
+    
+
     //Login API Call
     try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
