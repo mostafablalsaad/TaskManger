@@ -17,34 +17,47 @@ console.log("URL before the process ",process.env.CLIENT_URL);
 CLIENT_ORIGINS="https://my-frontend.vercel.app,https://my-frontend-git-preview.vercel.app"
 const raw = process.env.CLIENT_ORIGINS || process.env.CLIENT_URL || "";
 
+
 const allowedOrigins = raw.split(',').map(s => s.trim()).filter(Boolean);
 
-const corsOptions = {
-  origin: function(origin, callback) {
-    // allow requests with no origin (e.g., curl, mobile, server-to-server)
-    if (!origin) return callback(null, true);
+console.log("allowed origin is ",allowedOrigins);
 
-    if (allowedOrigins.length === 0) {
-      // No origins configured — deny by default (safer)
-      return callback(new Error('CORS not allowed - no allowed origins configured'), false);
-    }
+let corsOptions;
+if (allowedOrigins.length === 0) {
+  // If no origins configured, allow all origins but log a warning so the deployer
+  // is aware. This is less secure but avoids blocking legitimate frontends while
+  // the environment variable is not set.
+  console.warn("WARNING: No CLIENT_ORIGINS or CLIENT_URL configured — CORS is wide open.");
+  corsOptions = {
+    origin: true, // reflect request origin
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    exposedHeaders: ['Set-Cookie']
+  };
+} else {
+  corsOptions = {
+    origin: function(origin, callback) {
+      // allow requests with no origin (e.g., curl, mobile, server-to-server)
+      if (!origin) return callback(null, true);
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS not allowed by server'), false);
-    }
-  },
-  credentials: true, // allow session cookies
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  exposedHeaders: ['Set-Cookie'] // expose Set-Cookie if needed
-};
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        // don't throw — let middleware return a CORS failure with a clear message
+        callback(new Error('CORS not allowed by server'), false);
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    exposedHeaders: ['Set-Cookie']
+  };
+}
 
-// Middleware to handle CORS
-app.use(
-  cors(corsOptions)
-);
+// Middleware to handle CORS (ensure preflight requests are handled)
+app.options('*', cors(corsOptions)); // enable pre-flight for all routes
+app.use(cors(corsOptions));
 
 // Connect Database
 connectDB();
