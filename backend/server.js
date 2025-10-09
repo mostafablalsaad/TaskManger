@@ -66,9 +66,8 @@ connectDB();
 app.use(express.json());
 
 
-app.get("/api/helloWorld", (req, res) => {
-  res.status(200).json({ message: "you are in" });
-});
+app.get('/api/health', (req, res) => res.json({ ok: true, now: new Date().toISOString() }));
+
 
 // Routes
 app.use("/api/auth", authRoutes);
