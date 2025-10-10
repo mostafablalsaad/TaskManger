@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes")
 const taskRoutes = require("./routes/taskRoutes")
 const reportRoutes = require("./routes/reportRoutes")
 const serverless = require('serverless-http');
+const { console } = require("inspector");
 const app = express();
 
 console.log("URL before the process ",process.env.CLIENT_URL);
@@ -65,8 +66,14 @@ connectDB();
 // Middleware
 app.use(express.json());
 
+try
+{
 
-app.get('/api/health', (req, res) => res.json({ ok: true, now: new Date().toISOString() }));
+  app.get('/api/health', (req, res) => res.json({ ok: true, now: new Date().toISOString() }));
+}catch(error)
+{
+  console.log("error in the health api",error)
+}
 
 
 // Routes
